@@ -1,15 +1,7 @@
-from starlette.applications import Starlette
-from starlette.responses import HTMLResponse
-from starlette.routing import Route
+from flask import Flask
 
-async def home(request):
-    return HTMLResponse(f"""<pre>
-        url: {str(request.url)}
-        client:
-            host: {request.client.host}
-            port: {request.client.port}
-        headers:
-            {('<br>' + '&nbsp' * 12).join(k + ': ' + v for k, v in request.headers.items())}
-    </pre>""")
+app = Flask(__name__)
 
-app = Starlette(debug=True, routes=[Route('/', home),])
+@app.route("/")
+def hello_world():
+    return "hell"
