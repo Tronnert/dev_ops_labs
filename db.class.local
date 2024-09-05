@@ -1,0 +1,15 @@
+;
+; BIND data file for class.local
+;
+$TTL    604800
+@       IN      SOA     class.local. root.class.local. (
+                              7           ; Serial
+                        86400       ; Refresh
+                        7200          ; Retry
+                        3600000   ; Expire
+                        172800 )       ; Negative Cache TTL
+;
+@       IN      NS      srv1.class.local.
+@       IN      A       192.168.126.130
+@       IN      AAAA    ::1
+srv1    IN      A       192.168.126.130
