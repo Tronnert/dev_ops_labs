@@ -9,4 +9,4 @@ $TTL    604800
       IN      NS      ns1.nyc3.example.com.
 
 ; PTR Records
-11.10   IN      PTR     ns1.nyc3.example.com.    ; 10.0.2.8
+11.10   IN      PTR     ns1.nyc3.example.com.    ; 10.0.2.16
