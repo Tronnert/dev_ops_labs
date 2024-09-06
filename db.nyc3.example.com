@@ -8,7 +8,6 @@ $TTL    604800
 ;
 ; name servers - NS records
      IN      NS      ns1.nyc3.example.com.
-     IN      NS      ns2.nyc3.example.com.
 
 ; name servers - A records
 ns1.nyc3.example.com.          IN      A       10.0.2.16
