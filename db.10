@@ -1,13 +1,12 @@
-;
-; BIND reverse data file for local 192.168.126.xxx network
-;
 $TTL    604800
-@       IN      SOA     srv1.class.local. root.class.local. (
-                              7               ; Serial
-                          86400           ; Refresh
-                          7200             ; Retry
-                          3600000      ; Expire
-                          172800 )       ; Negative Cache TTL
-;
-@       IN      NS      srv1.
-10      IN      PTR     srv1.class.local.
+@       IN      SOA     nyc3.example.com. admin.nyc3.example.com. (
+                              3         ; Serial
+                         604800         ; Refresh
+                          86400         ; Retry
+                        2419200         ; Expire
+                         604800 )       ; Negative Cache TTL
+; name servers
+      IN      NS      ns1.nyc3.example.com.
+
+; PTR Records
+11.10   IN      PTR     ns1.nyc3.example.com.    ; 10.0.2.8
