@@ -7,5 +7,4 @@ sudo cp resolvconf.conf /etc
 sudo mkcert --install
 sudo mkcert memes.com
 
-sudo cp memes.com.conf /etc/nginx/sites-available
-ln -s /etc/nginx/sites-available/memes.com.conf /etc/nginx/sites-enabled/
+sudo cp nginx.conf /etc/nginx
