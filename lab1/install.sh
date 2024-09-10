@@ -13,7 +13,7 @@ sudo cp nginx.conf /etc/nginx
 
 sudo systemctl restart named
 
-resolvconf -u
+sudo resolvconf -u
 
 sudo systemctl restart nginx
 
