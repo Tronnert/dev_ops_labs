@@ -7,7 +7,7 @@ sudo cp resolvconf.conf /etc
 
 
 sudo mkcert --install
-sudo mkcert memes.com
+sudo mkcert local.com memes.local.com songs.local.com -key-file local-key.pem -cert-file local.pem
 
 sudo cp nginx.conf /etc/nginx
 
