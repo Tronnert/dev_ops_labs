@@ -4,4 +4,5 @@ app = Flask(__name__)
 
 @app.route("/")
 def hello_world():
-    return "hell\n"
+    return app.send_static_file("goldfish.png")
+    # return "hell\n"

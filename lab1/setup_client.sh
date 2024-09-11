@@ -1,2 +1,2 @@
-scp local.pem resolvconf.conf client_script.sh client@10.0.2.15:~/
-ssh client@10.0.2.15 -t "./client_script.sh"
+scp resolvconf.conf client@10.0.2.15:~/
+ssh client@10.0.2.22 -t "sudo resolvconf -u"
