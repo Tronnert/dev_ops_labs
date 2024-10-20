@@ -25,7 +25,7 @@ jobs:
 
     - name: Lint code
       run: |
-        flake8 .lab3/ --count --statistics --show-source
+        flake8 ./lab3 --count --statistics --show-source
     
   test:
     runs-on: ubuntu-20.04
