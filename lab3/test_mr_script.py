@@ -3,7 +3,7 @@ def test_mapreduce():
     dau = DAUmetric(args=["lab3/log.tsv"])
     with dau.make_runner() as runner:
         runner.run()
-        data = list(dau.parse_output(runner.cat_output())) 
+        data = list(dau.parse_output(runner.cat_output()))
         assert data == [
             ("2022-02-04", 24),
             ("2022-02-05", 54),
