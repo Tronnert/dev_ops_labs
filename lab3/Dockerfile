@@ -1,6 +1,6 @@
 FROM python:3.10
 
-ADD lab3/mr_script.py .
+ADD mr_script.py .
 
 ADD requirements.txt .
 
