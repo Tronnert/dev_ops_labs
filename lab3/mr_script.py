@@ -27,7 +27,7 @@ class DAUmetric(MRJob):
         dates.sort(key=lambda x: int(x[0].split("-")[2]))
         for date, dau in dates:
             yield date, dau
-
+    
     def steps(self):
         return [
             MRStep(mapper=self.mapper, reducer=self.reducer),
