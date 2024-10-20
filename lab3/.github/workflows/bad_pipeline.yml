@@ -25,7 +25,7 @@ jobs:
 
     - name: Lint code
       run: |
-        flake8 .lab3/ --exit_zero
+        flake8 .lab3/ --exit-zero
 
     - name: Test with pytest
       run: |
