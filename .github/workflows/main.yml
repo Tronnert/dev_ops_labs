@@ -47,5 +47,5 @@ jobs:
       with:
           context: .
           push: true
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/mapreduce_script:$(date-'%Y-%m-%d %H-%M-%S')
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/mapreduce_script:latest
 
