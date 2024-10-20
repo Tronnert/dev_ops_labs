@@ -3,7 +3,7 @@ name: MapReduce script
 on: push
 
 jobs:
-  build-test:
+  build:
 
     runs-on: ubuntu-latest
 
