@@ -67,7 +67,7 @@ user_0001	2022-02-04T09:17:00	confirmation	28790.00	12125;16320;12619;110951
 
 Секреты работают и их можно использовать, но (!) локально. Чтобы иметь возможность их использовать в CI/CD пайплайне, нужно каким-то образом получить публичный URL для Vault-сервера. Сделать это поможет ngrok.
 
-Устанавливаем через команду `sudu apt install ngrok`
+Устанавливаем через команду `sudo apt install ngrok`
 
 ![ngrok установка](../img/3*_ngrok_install.png)
 
@@ -85,4 +85,101 @@ user_0001	2022-02-04T09:17:00	confirmation	28790.00	12125;16320;12619;110951
 
 ![Github secrets](../img/3*_github_secrets.png)
 
+Теперь создаем сам [пайплайн](https://github.com/Tronnert/dev_ops_labs/blob/main/lab3*/.github/workflows/pipeline.yml)
+
+
+Основное отличие от прошлого [пайплайна](https://github.com/Tronnert/dev_ops_labs/blob/main/lab3/.github/workflows/pipeline.yml), который был сделан в лабораторной №3 (без звездочки), состоит в наличии шага для получения секретов:
+
+```bash
+- name: Import Secrets
+    uses: hashicorp/vault-action@v2
+    with:
+    url: ${{ secrets.VAULT_ADDR }}
+    token: ${{ secrets.VAULT_TOKEN }}
+    secrets: |
+        secret/data/dockerhub DOCKERHUB_USERNAME | DOCKERHUB_USERNAME ;
+        secret/data/dockerhub DOCKERHUB_TOKEN | DOCKERHUB_TOKEN  ;
+```
+
+Здесь используется готовый Github-action от Hashicorp, с поощью которого мы получаем созданные секреты (они сохраняются в `env`). Можно заметить, что именно на этом шаге используются секреты, добавленные в репозиторий (`VAULT_ADDR` и `VAULT_TOKEN`).
+
+Полностью пайплайн выглядит следующим образом:
+
+```bash
+name: MapReduce script
+
+on:
+  push:
+    branches:
+        - main
+
+jobs:
+  build:
+    runs-on: ubuntu-20.04
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v3
+      with:
+        python-version: "3.10"
+        cache: 'pip'
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install flake8 pytest
+        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+
+    - name: Lint code
+      run: |
+        flake8 . --count --statistics --show-source
+
+    - name: Test with pytest
+      run: |
+        pytest
+
+  deploy:
+    runs-on: ubuntu-20.04
+    needs: build
+    steps:
+
+    - name: Import Secrets
+      uses: hashicorp/vault-action@v2
+      with:
+        url: ${{ secrets.VAULT_ADDR }}
+        token: ${{ secrets.VAULT_TOKEN }}
+        secrets: |
+          secret/data/dockerhub DOCKERHUB_USERNAME | DOCKERHUB_USERNAME ;
+          secret/data/dockerhub DOCKERHUB_TOKEN | DOCKERHUB_TOKEN  ;
+
+    - name: Login to Docker Hub
+      uses: docker/login-action@v3
+      with:
+          username: ${{ env.DOCKERHUB_USERNAME }}
+          password: ${{ env.DOCKERHUB_TOKEN }}
+    
+    - name: Build and push
+      uses: docker/build-push-action@v6
+      with:
+          push: true
+          tags: ${{ env.DOCKERHUB_USERNAME }}/mapreduce_script:latest
+```
+
+После получения секретов происходит авторизация на DockerHub и build&push образа кода проекта в него. Здесь уже используются переменные, записанные в `env`.
+
+Результат выполнения пайплайна показан на картинках ниже.
+
+![pipeline success](../img/3*_pipeline_success.png)
+
+![piepline deploy](../img/3*_pipeline_deploy.png)
+
+и на DockerHub образ был успешно загружен:
+
+![DockerHub Image](../img/3*_dockerhub.png)
+
+Все работает, и лабораторную работу можно считать выполненной!
+
+### Обзор на такой способ использования секретов
 
