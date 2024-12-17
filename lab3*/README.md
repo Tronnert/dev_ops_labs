@@ -25,3 +25,64 @@ user_0001	2022-02-04T09:17:00	confirmation	28790.00	12125;16320;12619;110951
 
 Работа с секретами нужна на последнем этапе, так как для пуша образа на DockerHub нужен токен, и именно для хранения этого токена и получения доступа к нему будет использована секретохранилка.
 
+### Установка HashicorpVault
+
+Мы решили использовать [образ](https://hub.docker.com/r/hashicorp/vault) HashicorpVault на DockerHub. Устанавливаем его через `docker pull hashicorp/vault`
+
+![установка Vault](../img/3*_vault_install.png)
+
+Затем запустим контейнер, использовав команду `sudo docker run -d --name vault --cap-add=IPC_LOCK -e 'VAULT_DEV_ROOT_TOKEN_ID=5ebe2294ecd0e0f08eab7690d2a6ee69' -e 'VAULT_DEV_LISTEN_ADDRESS=0.0.0.0:8200' hashicorp/vault`, где важным для нас является `ROOT_TOKEN_ID` и `VAULT_DEV_LISTEN_ADDRESS` (их нужно запомнить).
+
+Проверим, что контейнер работает:
+
+![Запуск контейнера Vault](../img/3*_create_vault_docker_container.png)
+
+Получим IP-адрес, на котором работает секретохранилка, и сохраним его в переменную `VAULT_ADDR`:
+
+![Поиск IP](../img/3*_find_docker_ipaddress.png)
+
+Как видно, по этому адресу и на выбранном нами порте (8200), Vault-сервер действительно работает:
+
+![Vault UI](../img/3*_vault_ui1.png)
+
+А чтобы войти, нужно указать `ROOT_TOKEN_ID`, который мы задавали при запуске контейнера (`5ebe2294ecd0e0f08eab7690d2a6ee69`):
+
+![Vault UI](../img/3*_vault_ui2.png)
+
+Затем нужно установить Vault CLI. С [официального сайта](https://developer.hashicorp.com/vault/install?product_intent=vault) был скачан бинарник, который после разархивирования перемещен в `/usr/bin` в соответствии с [документацией](https://developer.hashicorp.com/vault/docs/install/install-binary). После этого можно проверить успешность установки через команду `vault -version`. Видим, что все прошло успешно.
+
+![Vault CLI](../img/3*_install_vault_cli.png)
+
+Сохраним адрес сервера и токен в переменные `VAULT_ADDR` и `VAULT_TOKEN` (первый мы нашли через `docker inspect`, второй мы задавали при создании контейнера). Авторизуемся в vault, использовав этот токен. Vault подключится к серверу с адресом, записанным в `VAULT_ADDR` (по умолчанию там будет `127.0.0.1:8200`, но у нас другой адрес - `172.0.0.2:8200`).
+
+![Vaul CLI login](../img/3*_vault_cli_login.png)
+
+С помощью команды `vault kv put` создаем два секрета, `DOCKERHUB_USERNAME` и `DOCKERHUB_TOKEN` для имени пользователя и токена для DockerHub соответственно (мы указали `-mount="secret" "dockerhub"` для пути сохранения секретов; сам путь имеет вид `secret/data/dockerhub`). Для проверки того, что секреты создались, используем команду `vault kv get`.
+
+![Vault secrets](../img/3*_create_secrets.png)
+
+Видно, что два секрета успешно были созданы.
+
+### Установка ngrok
+
+Секреты работают и их можно использовать, но (!) локально. Чтобы иметь возможность их использовать в CI/CD пайплайне, нужно каким-то образом получить публичный URL для Vault-сервера. Сделать это поможет ngrok.
+
+Устанавливаем через команду `sudu apt install ngrok`
+
+![ngrok установка](../img/3*_ngrok_install.png)
+
+Затем создаем туннель для адреса Vault-сервера с помощью команды `ngrok http ${VAULT_ADDR}`. Видим, что туннель создался, и нам надо запомнить публичный URL, записанный в Forwarding.
+
+![ngrok http](../img/3*_ngrok_tunnel.png)
+
+Перейдем по этому URL и введем сохраненный ранее vault-токен. Созданные ранее секреты тут есть! (не говоря уже о том, что в принципе Vault работает по публичной ссылке)
+
+![Vault with ngrok](../img/3*_vault_ngrok_works.png)
+
+### Создание CI/CD-пайплайна
+
+Для теста был создан отдельный [репозиторий](https://github.com/staffeev/devops_lab3_star). В настройках добавляем секреты: `VAULT_TOKEN`, который мы использовали ранее для авторизации в Vault, и `VAULT_ADDR`, куда мы заносим ***публичный*** адрес Vault-сервера, созданный ранее через ngrok (это важно, и без этого ничего работать не будет).
+
+![Github secrets](../img/3*_github_secrets.png)
+
+
