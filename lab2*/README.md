@@ -142,4 +142,4 @@ networks:
 Собственно судя по тому как питон не может достучаться до redis, понятно что доступа нет:
 ![isolate-docker-compose.png](../img/isolate-docker-compose.png)
 
-Типо все.
+Типо все
