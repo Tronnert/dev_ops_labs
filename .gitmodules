@@ -1,3 +1,6 @@
 [submodule "lab2*/test"]
 	path = lab2*/test
 	url = https://github.com/Tronnert/test
+[submodule "test"]
+	path = lab2*/test
+	url = https://github.com/Tronnert/test.git
